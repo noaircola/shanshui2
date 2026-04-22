@@ -3,66 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>詩意 AI 導航 - 《江雪》</title>
+    <title>詩意 AI 導航 - 古詩意境分析</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #333; line-height: 1.6; }
-        .card { background: white; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; border: 1px solid #e2e2d5; shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .card { background: white; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; border: 1px solid #e2e2d5; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .input-box { width: 100%; border-bottom: 2px solid #ddd; padding: 6px; outline: none; transition: all 0.3s; background: transparent; font-size: 0.9rem; }
         .input-box:focus { border-color: #8b5e3c; background: #fffcf5; }
         .label-tag { font-size: 0.85rem; font-weight: bold; color: #8b5e3c; margin-bottom: 0.75rem; display: block; border-left: 3px solid #8b5e3c; padding-left: 8px; }
-        .error-hint { color: #dc2626; font-size: 0.75rem; margin-top: 4px; display: block; }
+        .nav-btn { transition: all 0.3s; border: 1px solid #d1cfc7; }
+        .nav-btn.active { background-color: #1c1917; color: white; border-color: #1c1917; shadow: 0 4px 12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body class="p-4 md:p-10">
     <div id="app" class="max-w-5xl mx-auto">
+        <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button v-for="(poem, key) in poems" :key="key" @click="selectPoem(key)" :class="['nav-btn px-6 py-2 rounded-full text-sm font-bold', currentKey === key ? 'active' : 'bg-white text-stone-600 hover:bg-stone-100']">
+                {{ poem.title }}
+            </button>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div class="card flex flex-col justify-center">
-                <h2 class="text-3xl font-bold mb-4 text-stone-800">柳宗元《江雪》</h2>
-                <p class="text-xl tracking-[0.25em] leading-loose mb-6 border-l-4 border-stone-300 pl-6 font-bold">
-                    千山鳥飛絕，萬徑人蹤滅。<br>
-                    孤舟蓑笠翁，獨釣寒江雪。
-                </p>
+                <h2 class="text-3xl font-bold mb-4 text-stone-800">{{ currentPoem.author }}《{{ currentPoem.title }}》</h2>
+                <p class="text-xl tracking-[0.25em] leading-loose mb-6 border-l-4 border-stone-300 pl-6 font-bold whitespace-pre-line">{{ currentPoem.content }}</p>
                 <h3 class="font-bold text-stone-600 mb-2">【語譯】</h3>
-                <p class="text-stone-500 text-sm leading-relaxed">
-                    群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁；他正獨自在漫天風雪的寒冷江面上垂釣。
-                </p>
+                <p class="text-stone-500 text-sm leading-relaxed">{{ currentPoem.translation }}</p>
             </div>
             <div class="card p-0 overflow-hidden aspect-video shadow-2xl bg-black">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vIc1XjFqU6o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <iframe :src="currentPoem.video" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
             </div>
         </div>
 
         <div class="card">
             <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
                 <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">1</span>
-                觀察景物：請在詩中找出景物，並分類填寫（每類至少填寫兩項）
+                觀察景物：試在詩中找出景物並分類（每類至少填寫兩項）
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div>
-                    <label class="label-tag">遠景 (如：山、天空、雲)</label>
+                    <label class="label-tag">遠景</label>
                     <div class="space-y-3">
-                        <input v-model="analysis.far[0]" class="input-box" placeholder="景物 1 (必填)">
-                        <input v-model="analysis.far[1]" class="input-box" placeholder="景物 2 (必填)">
-                        <input v-model="analysis.far[2]" class="input-box" placeholder="景物 3 (選填)">
+                        <input v-model="analysis.far[0]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.far[1]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.far[2]" class="input-box" placeholder="輸入景物...">
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">中景 (如：江水、雪、小徑)</label>
+                    <label class="label-tag">中景</label>
                     <div class="space-y-3">
-                        <input v-model="analysis.mid[0]" class="input-box" placeholder="景物 1 (必填)">
-                        <input v-model="analysis.mid[1]" class="input-box" placeholder="景物 2 (必填)">
-                        <input v-model="analysis.mid[2]" class="input-box" placeholder="景物 3 (選填)">
+                        <input v-model="analysis.mid[0]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.mid[1]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.mid[2]" class="input-box" placeholder="輸入景物...">
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">近景 (如：孤舟、漁翁、蓑衣)</label>
+                    <label class="label-tag">近景</label>
                     <div class="space-y-3">
-                        <input v-model="analysis.near[0]" class="input-box" placeholder="景物 1 (必填)">
-                        <input v-model="analysis.near[1]" class="input-box" placeholder="景物 2 (必填)">
-                        <input v-model="analysis.near[2]" class="input-box" placeholder="景物 3 (選填)">
+                        <input v-model="analysis.near[0]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.near[1]" class="input-box" placeholder="輸入景物...">
+                        <input v-model="analysis.near[2]" class="input-box" placeholder="輸入景物...">
                     </div>
                 </div>
             </div>
@@ -71,31 +73,27 @@
         <div class="card">
             <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
                 <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">2</span>
-                賞析與氛圍感
+                意境與色彩分析
             </h3>
-            
             <div class="mb-8">
                 <label class="label-tag">賞析資料參考</label>
                 <div class="bg-stone-50 p-6 rounded-xl text-stone-600 text-sm leading-7 border border-stone-100 shadow-inner">
-                    這首詩描繪了一幅極度<strong>幽靜、空靈</strong>的寒江雪景圖。前兩句以「千山」、「萬徑」的廣闊背景，烘托出大雪封山、萬物絕跡的<strong>絕對死寂與孤寒</strong>氛圍。隨後視角急轉直下，聚焦於茫茫白雪中「孤舟」上的「蓑笠翁」。在凜冽的風雪中，老翁傲然獨釣，不僅渲染出<strong>清冷、孤獨</strong>的絕美意境，更巧妙地寄託了詩人當時雖遭貶謫，卻依然清高孤傲、不屈不撓的高潔品格。
+                    {{ currentPoem.appreciation }}
                 </div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                    <label class="label-tag">根據賞析，嘗試想像詩中的氛圍會是怎樣的？</label>
-                    <p class="text-xs text-stone-400 mb-3">請輸入兩個形容詞 (如：孤寂、清冷、壯闊)</p>
-                    <div class="flex gap-4">
-                        <input v-model="analysis.mood1" class="input-box" placeholder="氣氛 1">
-                        <input v-model="analysis.mood2" class="input-box" placeholder="氣氛 2">
+                    <label class="label-tag">根據賞析，嘗試想像詩中的氛圍和色彩會是怎樣的？</label>
+                    <div class="flex gap-4 mt-4">
+                        <input v-model="analysis.mood1" class="input-box" placeholder="氣氛形容詞 1">
+                        <input v-model="analysis.mood2" class="input-box" placeholder="氣氛形容詞 2">
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">選擇你想像中的意境色調</label>
-                    <p class="text-xs text-stone-400 mb-3">拖動下方色塊來決定詩畫的色彩基調</p>
-                    <div class="flex items-center gap-4">
+                    <label class="label-tag">選擇詩詞的色調</label>
+                    <div class="flex items-center gap-4 mt-4">
                         <input type="color" v-model="analysis.color" class="w-14 h-14 rounded-full cursor-pointer border-2 border-white shadow-md">
-                        <span class="text-xs font-mono text-stone-500 bg-white px-2 py-1 rounded border">{{ analysis.color }}</span>
+                        <span class="text-xs font-mono text-stone-500">{{ analysis.color }}</span>
                     </div>
                 </div>
             </div>
@@ -105,18 +103,15 @@
             <button @click="generatePrompt" class="bg-stone-800 hover:bg-black text-white px-12 py-4 rounded-full font-bold text-lg transition-all shadow-2xl active:scale-95">
                 ✨ 生成圖片提詩詞
             </button>
-
-            <div v-if="finalPrompt" id="result" class="mt-10 p-8 bg-white border-2 border-stone-200 rounded-2xl shadow-sm text-left animate-fade-in">
+            <div v-if="finalPrompt" id="result" class="mt-10 p-8 bg-white border-2 border-stone-200 rounded-2xl shadow-sm text-left">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-black text-stone-400 uppercase tracking-tighter">AI Prompt (已整合詩詞與分析)</span>
-                    <button @click="copyPrompt" class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-md hover:bg-blue-100 transition">📋 點擊複製</button>
+                    <span class="text-xs font-black text-stone-400 uppercase tracking-tighter">AI Prompt</span>
+                    <button @click="copyPrompt" class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-md">📋 點擊複製</button>
                 </div>
-                <div class="bg-stone-50 p-5 rounded-xl text-stone-700 font-mono text-sm leading-relaxed border border-stone-100">
-                    {{ finalPrompt }}
-                </div>
+                <div class="bg-stone-50 p-5 rounded-xl text-stone-700 font-mono text-sm leading-relaxed border border-stone-100 whitespace-pre-line">{{ finalPrompt }}</div>
                 <div class="mt-6 flex flex-col items-center">
                     <p class="text-xs text-stone-400 mb-3">複製後可前往以下平台生成圖片：</p>
-                    <a href="https://www.bing.com/images/create" target="_blank" class="text-blue-500 underline text-sm font-bold">Bing Image Creator (推薦)</a>
+                    <a href="https://www.bing.com/images/create" target="_blank" class="text-blue-500 underline text-sm font-bold">Bing Image Creator (推薦使用)</a>
                 </div>
             </div>
         </div>
@@ -127,55 +122,83 @@
         createApp({
             data() {
                 return {
-                    analysis: {
-                        far: ['', '', ''],
-                        mid: ['', '', ''],
-                        near: ['', '', ''],
-                        mood1: '',
-                        mood2: '',
-                        color: '#d1d5db'
-                    },
-                    finalPrompt: ''
+                    currentKey: 'jiangxue',
+                    analysis: { far:['','',''], mid:['','',''], near:['','',''], mood1:'', mood2:'', color:'#d1d5db' },
+                    finalPrompt: '',
+                    poems: {
+                        jiangxue: {
+                            title: '江雪', author: '柳宗元',
+                            content: '千山鳥飛絕，萬徑人蹤滅。\n孤舟蓑笠翁，獨釣寒江雪。',
+                            translation: '群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁；他正獨自在漫天風雪的寒冷江面上垂釣。',
+                            appreciation: '這首詩描繪了一幅極度幽靜、空靈的寒江雪景圖。前兩句以「千山」、「萬徑」的廣闊背景，烘托出大雪封山、萬物絕跡的絕對死寂與孤寒氛圍。隨後視角急轉直下，聚焦於茫茫白雪中「孤舟」上的「蓑笠翁」。在凜冽的風雪中，老翁傲然獨釣，不僅渲染出清冷、孤獨的絕美意境，更巧妙地寄託了詩人當時雖遭貶謫，卻依然清高孤傲、不屈不撓的高潔品格。',
+                            video: 'https://www.youtube.com/embed/vIc1XjFqU6o',
+                            enSummary: 'A lonely old fisherman in a straw cape fishing on a tiny boat in a vast, snowy, silent river landscape. Minimalist, cold atmosphere.'
+                        },
+                        fengqiao: {
+                            title: '楓橋夜泊', author: '張繼',
+                            content: '月落烏啼霜滿天，江楓漁火對愁眠。\n姑蘇城外寒山寺，夜半鐘聲到客船。',
+                            translation: '月亮已經落下，烏鴉聲聲啼叫，秋霜瀰漫了整個夜空；面對著江邊的楓樹和江面上點點的漁火，滿懷愁緒的旅人難以入睡。此時，姑蘇城外那座寒山寺，在半夜裡敲響的悠揚鐘聲，陣陣傳到了我所乘的這艘客船上。',
+                            appreciation: '這首詩描繪了一幅江南深秋夜泊的孤寂畫卷。透過落月、啼烏、滿天霜、江楓與漁火等意象，交織出清冷幽暗的淒美與寂寥氛圍。後兩句則巧妙地「以動襯靜」，將遠處寒山寺的夜半鐘聲傳入客船。那悠遠的鐘聲劃破了夜空的寧靜，不僅在聽覺上帶來綿長的餘韻，更深深觸動了旅人孤寂的心靈。',
+                            video: 'https://www.youtube.com/embed/xgSCYzVo29g',
+                            enSummary: 'Midnight at Maple Bridge. Falling moon, frost, maple trees, fishing lights, a passenger boat, and a distant temple under the moonlight. Melancholy and peaceful mood.'
+                        },
+                        shanxing: {
+                            title: '山行', author: '杜牧',
+                            content: '遠上寒山石徑斜，白雲生處有人家。\n停車坐愛楓林晚，霜葉紅於二月花。',
+                            translation: '沿著傾斜蜿蜒的石板小路，向著高遠的秋日山峰攀登；在白雲繚繞飄浮的高處，隱約可以看到幾戶人家。特地停下馬車，是因為太過喜愛這深秋楓林的傍晚美景；那經過秋霜染透的楓葉，簡直比二月裡盛開的春花還要鮮紅奪目。',
+                            appreciation: '這首詩描繪了一幅生機勃勃的秋日山林圖。前兩句勾勒出高遠空靈的背景，並以「有人家」點綴出一抹溫暖的人間煙火。後兩句則是全詩精華，詩人以「紅於二月花」來讚美霜葉，一掃傳統詠秋詩的蕭瑟與悲涼，營造出色彩明麗、充滿熱情與生機的氛圍。',
+                            video: 'https://www.youtube.com/embed/Q95hBdIb_Iw',
+                            enSummary: 'Vibrant autumn mountain with a winding stone path, white clouds, small cottages, and fiery red maple leaves glowing in the evening light. Energetic and warm atmosphere.'
+                        },
+                        baidicheng: {
+                            title: '早發白帝城', author: '李白',
+                            content: '朝辭白帝彩雲間，千里江陵一日還。\n兩岸猿聲啼不住，輕舟已過萬重山。',
+                            translation: '清晨時分，告別了高聳入雲、宛如隱沒在彩雲深處的白帝城；相距千里的江陵，乘船順流而下，一天之內就能抵達。長江兩岸猿猴的啼叫聲此起彼落、連綿不絕；就在這清脆的啼聲中，輕快的小船早已經駛過了千山萬嶺。',
+                            appreciation: '這首詩生動描繪了詩人遇赦後順江而下的暢快心情。首句以「彩雲間」奠定了明朗與歡悅的氛圍。「千里」與「一日」凸顯了船行之速。後兩句以連綿不絕的猿啼聲作為動態背景，生動烘托出「輕舟」乘風破浪的輕捷姿態，完美融合了山水景色與喜悅之情。',
+                            video: 'https://www.youtube.com/embed/zlnG0EGNUWc',
+                            enSummary: 'A small boat sailing rapidly through the deep gorges of the Yangtze River at dawn. Colorful clouds, steep mountains, and the sound of gibbons. Fast-paced, joyful, and magnificent scenery.'
+                        },
+                        guanquelou: {
+                            title: '登鸛雀樓', author: '王之渙',
+                            content: '白日依山盡，黃河入海流。\n欲窮千里目，更上一層樓。',
+                            translation: '夕陽依傍著連綿的群山漸漸西沉隱沒，奔騰的黃河水向著大海滾滾東流。如果想要將千里之外更為遼闊的景致盡收眼底，就需要再往上登高一層樓。',
+                            appreciation: '這首詩描繪了一幅北方雄奇壯麗的山水畫卷。前兩句視角開闊，由高遠的落日轉向奔流的江水，營造出雄渾壯闊、氣象萬千的氛圍。後兩句則將寫景昇華為哲理，表達了「站得高才能看得遠」的深刻意涵。全詩蘊含了詩人高瞻遠矚的廣闊胸襟。',
+                            video: 'https://www.youtube.com/embed/ihTCFnDbYSo',
+                            enSummary: 'A grand view from a high tower. Golden sunset over the mountains, the yellow river flowing towards the sea. Majestic, vast, and epic Chinese landscape.'
+                        }
+                    }
                 }
             },
+            computed: { currentPoem() { return this.poems[this.currentKey]; } },
             methods: {
-                generatePrompt() {
-                    // 驗證邏輯：每一景至少填兩個
-                    const farCount = this.analysis.far.filter(i => i.trim() !== '').length;
-                    const midCount = this.analysis.mid.filter(i => i.trim() !== '').length;
-                    const nearCount = this.analysis.near.filter(i => i.trim() !== '').length;
-
-                    if (farCount < 2 || midCount < 2 || nearCount < 2 || !this.analysis.mood1 || !this.analysis.mood2) {
-                        alert('【提醒】遠、中、近景請至少各填寫兩項景物，並輸入兩個氣氛形容詞喔！');
-                        return;
-                    }
-
-                    // 整合景物字串
-                    const farText = this.analysis.far.filter(i => i).join(', ');
-                    const midText = this.analysis.mid.filter(i => i).join(', ');
-                    const nearText = this.analysis.near.filter(i => i).join(', ');
-
-                    // 生成提示詞
-                    // 包含原文以幫助 AI 理解深度意境
-                    this.finalPrompt = `Subject: Traditional Chinese Ink Painting, "Jiang Xue" (River Snow). 
-Poem Context: "Thousands of mountains, no birds fly; tens of thousands of paths, no footprints. A lone boat, an old man in straw cape and bamboo hat, fishing alone in the cold river snow."
-Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}, cinematic lighting, cold, serene, minimalist.
-Composition: 
-- Background (Far): ${farText}
-- Midground (Mid): ${midText}
-- Foreground (Near): ${nearText}
-Color Palette: Based on ${this.analysis.color}, monochrome style with ink wash effects. 
-Style: Highly detailed, zen, empty space (Liubai), 8k resolution.`;
-
-                    // 滾動到結果
-                    setTimeout(() => {
-                        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
+                selectPoem(key) { 
+                    this.currentKey = key; this.finalPrompt = ''; 
+                    this.analysis = { far:['','',''], mid:['','',''], near:['','',''], mood1:'', mood2:'', color:'#d1d5db' };
                 },
-                copyPrompt() {
-                    navigator.clipboard.writeText(this.finalPrompt);
-                    alert('提示詞已複製！請貼到 AI 繪圖網站。');
-                }
+                generatePrompt() {
+                    const farC = this.analysis.far.filter(i => i.trim()).length;
+                    const midC = this.analysis.mid.filter(i => i.trim()).length;
+                    const nearC = this.analysis.near.filter(i => i.trim()).length;
+                    if (farC < 2 || midC < 2 || nearC < 2 || !this.analysis.mood1 || !this.analysis.mood2) {
+                        alert('【請注意】遠景、中景、近景請各輸入至少兩項景物，並填寫兩項氣氛形容詞。'); return;
+                    }
+                    const fText = this.analysis.far.filter(i => i).join(', ');
+                    const mText = this.analysis.mid.filter(i => i).join(', ');
+                    const nText = this.analysis.near.filter(i => i).join(', ');
+
+                    this.finalPrompt = `Art Style: Traditional Chinese Ink Wash Painting. 
+Poem: "${this.currentPoem.title}" by ${this.currentPoem.author}.
+Theme: ${this.currentPoem.enSummary}
+Visual Layers:
+- Far: ${fText}
+- Mid: ${mText}
+- Near: ${nText}
+Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}.
+Color Tone: Main color base ${this.analysis.color}, high contrast ink textures, aesthetic space usage (Liubai). 8k, cinematic, poetic.`;
+                    
+                    setTimeout(() => { document.getElementById('result').scrollIntoView({ behavior: 'smooth' }); }, 100);
+                },
+                copyPrompt() { navigator.clipboard.writeText(this.finalPrompt); alert('提示詞已複製！'); }
             }
         }).mount('#app');
     </script>
