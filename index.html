@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>詩意 AI 導航 - 《江雪》</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #333; }
+        .card { background: white; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 2rem; margin-bottom: 2rem; border: 1px solid #e2e2d5; }
+        .input-box { width: 100%; border-bottom: 2px solid #ccc; padding: 8px; outline: none; transition: border-color 0.3s; background: transparent; }
+        .input-box:focus { border-color: #8b5e3c; }
+        .label-tag { font-size: 0.8rem; font-weight: bold; color: #8b5e3c; margin-bottom: 0.5rem; display: block; }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div id="app" class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="card flex flex-col justify-center">
+                <h2 class="text-3xl font-bold mb-4 text-stone-800">柳宗元《江雪》</h2>
+                <p class="text-xl tracking-[0.2em] leading-loose mb-6 border-l-4 border-stone-300 pl-4">
+                    千山鳥飛絕，萬徑人蹤滅。<br>
+                    孤舟蓑笠翁，獨釣寒江雪。
+                </p>
+                <h3 class="font-bold text-stone-600 mb-2">【語譯】</h3>
+                <p class="text-stone-500 leading-relaxed text-sm">
+                    群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁，正獨自在漫天風雪的寒冷江面上垂釣。
+                </p>
+            </div>
+            <div class="card p-0 overflow-hidden aspect-video shadow-2xl">
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vIc1XjFqU6o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm">1</span>
+                觀察景物：試在詩中找被描繪的景物，並以遠中近景將其分類
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <label class="label-tag">遠景 (如：群山、天空)</label>
+                    <input v-model="analysis.far" class="input-box" placeholder="輸入景物...">
+                </div>
+                <div>
+                    <label class="label-tag">中景 (如：江面、小徑)</label>
+                    <input v-model="analysis.mid" class="input-box" placeholder="輸入景物...">
+                </div>
+                <div>
+                    <label class="label-tag">近景 (如：孤舟、漁翁)</label>
+                    <input v-model="analysis.near" class="input-box" placeholder="輸入景物...">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm">2</span>
+                意境與色彩分析
+            </h3>
+            <div class="bg-stone-50 p-4 rounded-lg mb-6 text-sm text-stone-600 leading-relaxed italic">
+                「這首詩描繪了一幅極度幽靜、空靈的寒江雪景圖。前兩句以廣闊背景烘托出萬物絕跡的絕對死寂與孤寒氛圍...」
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label class="label-tag">你想用哪兩個詞形容這首詩的氣氛？</label>
+                    <div class="flex gap-2">
+                        <input v-model="analysis.mood1" class="input-box" placeholder="形容詞 1">
+                        <input v-model="analysis.mood2" class="input-box" placeholder="形容詞 2">
+                    </div>
+                </div>
+                <div>
+                    <label class="label-tag">選擇詩中的主色調 (點擊圓圈選擇顏色)</label>
+                    <div class="flex items-center gap-4 mt-2">
+                        <input type="color" v-model="analysis.color" class="w-12 h-12 rounded-full cursor-pointer border-none">
+                        <span class="text-sm text-stone-500">當前選擇：{{ analysis.color }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-20">
+            <button @click="generatePrompt" class="bg-stone-800 hover:bg-stone-700 text-white px-10 py-4 rounded-full font-bold text-lg transition-all shadow-xl">
+                ✨ 生成 AI 繪圖提示詞
+            </button>
+
+            <div v-if="finalPrompt" class="mt-8 p-6 bg-white border-2 border-dashed border-stone-400 rounded-xl animate-fade-in">
+                <p class="text-xs font-bold text-stone-400 mb-2 uppercase tracking-widest">以下是你的 AI 提示詞 (English Version for AI)</p>
+                <div class="bg-stone-100 p-4 rounded-lg text-lg font-mono mb-4 text-left">
+                    {{ finalPrompt }}
+                </div>
+                <button @click="copyPrompt" class="text-blue-600 font-bold hover:underline">📋 點擊複製提示詞</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    analysis: {
+                        far: '', mid: '', near: '',
+                        mood1: '', mood2: '',
+                        color: '#cccccc'
+                    },
+                    finalPrompt: ''
+                }
+            },
+            methods: {
+                generatePrompt() {
+                    if(!this.analysis.far || !this.analysis.mood1) {
+                        alert('請填寫景物與氛圍分析，這能幫助 AI 畫得更好！');
+                        return;
+                    }
+                    // 將中文輸入轉化為 AI 較易理解的英文模板 (實際應用中可加入簡單翻譯邏輯或直接用中文，現在主流AI也懂中文)
+                    const base = "Traditional Chinese Ink Painting style, master work, high quality.";
+                    const content = `Scene: ${this.analysis.far} in distance, ${this.analysis.mid} in middle ground, ${this.analysis.near} in foreground.`;
+                    const mood = `Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}, cold, silent, snowy.`;
+                    const color = `Main color tone: ${this.analysis.color}.`;
+                    
+                    this.finalPrompt = `${base} ${content} ${mood} ${color} Minimalist composition, heavy snow.`;
+                },
+                copyPrompt() {
+                    navigator.clipboard.writeText(this.finalPrompt);
+                    alert('提示詞已複製！可以前往 AI 繪圖網站貼上了。');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
