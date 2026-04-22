@@ -14,14 +14,15 @@
         .input-box:focus { border-color: #8b5e3c; background: #fffcf5; }
         .label-tag { font-size: 0.85rem; font-weight: bold; color: #8b5e3c; margin-bottom: 0.75rem; display: block; border-left: 3px solid #8b5e3c; padding-left: 8px; }
         .nav-btn { transition: all 0.3s; border: 1px solid #d1cfc7; }
-        .nav-btn.active { background-color: #1c1917; color: white; border-color: #1c1917; shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .prompt-tag { background-color: #f1f5f9; color: #475569; padding: 2px 6px; rounded: 4px; font-family: monospace; font-size: 0.75rem; margin-right: 4px; }
+        .nav-btn.active { background-color: #1c1917; color: white; border-color: #1c1917; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
     </style>
 </head>
 <body class="p-4 md:p-10">
     <div id="app" class="max-w-5xl mx-auto">
         <div class="flex flex-wrap justify-center gap-3 mb-10">
-            <button v-for="(poem, key) in poems" :key="key" @click="selectPoem(key)" :class="['nav-btn px-6 py-2 rounded-full text-sm font-bold', currentKey === key ? 'active' : 'bg-white text-stone-600 hover:bg-stone-100']">
+            <button v-for="(poem, key) in poems" :key="key" @click="selectPoem(key)" :class="['nav-btn px-6 py-2 rounded-full text-sm font-bold', currentKey === key ? 'active' : 'bg-white text-stone- stone-600 hover:bg-stone-100']">
                 {{ poem.title }}
             </button>
         </div>
@@ -41,11 +42,11 @@
         <div class="card">
             <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
                 <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">1</span>
-                觀察景物：請在詩中找出景物並分類（每類至少填寫兩項）
+                觀察景物：找出景物並分類填寫（每類至少填兩項）
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div>
-                    <label class="label-tag">遠景 (Background)</label>
+                    <label class="label-tag">遠景 (畫面最上方)</label>
                     <div class="space-y-3">
                         <input v-model="analysis.far[0]" class="input-box" placeholder="景物 1">
                         <input v-model="analysis.far[1]" class="input-box" placeholder="景物 2">
@@ -53,7 +54,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">中景 (Middle Ground)</label>
+                    <label class="label-tag">中景 (畫面中間)</label>
                     <div class="space-y-3">
                         <input v-model="analysis.mid[0]" class="input-box" placeholder="景物 1">
                         <input v-model="analysis.mid[1]" class="input-box" placeholder="景物 2">
@@ -61,7 +62,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">近景 (Foreground)</label>
+                    <label class="label-tag">近景 (畫面最下方)</label>
                     <div class="space-y-3">
                         <input v-model="analysis.near[0]" class="input-box" placeholder="景物 1">
                         <input v-model="analysis.near[1]" class="input-box" placeholder="景物 2">
@@ -74,7 +75,7 @@
         <div class="card">
             <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
                 <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">2</span>
-                意境與色彩分析
+                氛圍與色彩分析
             </h3>
             <div class="mb-8">
                 <label class="label-tag">賞析資料參考</label>
@@ -84,14 +85,14 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                    <label class="label-tag">根據賞析，嘗試想像詩中的氛圍和色彩會是怎樣的？</label>
+                    <label class="label-tag">輸入兩個形容詞來描述詩中的氛圍</label>
                     <div class="flex gap-4 mt-4">
-                        <input v-model="analysis.mood1" class="input-box" placeholder="氣氛形容詞 1">
-                        <input v-model="analysis.mood2" class="input-box" placeholder="氣氛形容詞 2">
+                        <input v-model="analysis.mood1" class="input-box" placeholder="形容詞 1">
+                        <input v-model="analysis.mood2" class="input-box" placeholder="形容詞 2">
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">選擇詩詞的色調</label>
+                    <label class="label-tag">選擇主色調</label>
                     <div class="flex items-center gap-4 mt-4">
                         <input type="color" v-model="analysis.color" class="w-14 h-14 rounded-full cursor-pointer border-2 border-white shadow-md">
                         <span class="text-xs font-mono text-stone-500">{{ analysis.color }}</span>
@@ -102,17 +103,24 @@
 
         <div class="text-center mb-20">
             <button @click="generatePrompt" class="bg-stone-800 hover:bg-black text-white px-12 py-4 rounded-full font-bold text-lg transition-all shadow-2xl active:scale-95">
-                ✨ 生成直幅構圖提示詞
+                ✨ 生成 AI 繪圖提示詞 (支援豆包/Bing)
             </button>
+            
             <div v-if="finalPrompt" id="result" class="mt-10 p-8 bg-white border-2 border-stone-200 rounded-2xl shadow-sm text-left animate-fade-in">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-black text-stone-400 uppercase tracking-tighter">AI Prompt (Vertical & 3-Stage)</span>
-                    <button @click="copyPrompt" class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-md">📋 點擊複製</button>
+                    <span class="text-xs font-black text-stone-400">AI 提示詞內容</span>
+                    <button @click="copyPrompt" class="text-sm bg-blue-50 text-blue-600 px-4 py-2 rounded-lg">📋 點擊複製</button>
                 </div>
-                <div class="bg-stone-50 p-5 rounded-xl text-stone-700 font-mono text-sm leading-relaxed border border-stone-100 whitespace-pre-line">{{ finalPrompt }}</div>
+                <div class="bg-stone-50 p-5 rounded-xl text-stone-700 text-sm leading-relaxed border border-stone-100 whitespace-pre-line">
+                    {{ finalPrompt }}
+                </div>
                 <div class="mt-6 flex flex-col items-center">
-                    <p class="text-xs text-stone-400 mb-3">複製後可前往以下平台生成圖片：</p>
-                    <a href="https://www.bing.com/images/create" target="_blank" class="text-blue-500 underline text-sm font-bold active:scale-95">Bing Image Creator (推薦使用)</a>
+                    <p class="text-xs text-stone-400 mb-3 font-bold uppercase tracking-widest">複製後貼上至 AI 生成圖片</p>
+                    <div class="flex gap-4">
+                        <a href="https://www.bing.com/images/create" target="_blank" class="text-blue-500 underline text-sm font-bold">Bing Image Creator</a>
+                        <span class="text-stone-300">|</span>
+                        <a href="https://www.doubao.com/" target="_blank" class="text-blue-500 underline text-sm font-bold">豆包 (Doubao)</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,87 +135,45 @@
                     analysis: { far:['','',''], mid:['','',''], near:['','',''], mood1:'', mood2:'', color:'#d1d5db' },
                     finalPrompt: '',
                     poems: {
-                        jiangxue: {
-                            title: '江雪', author: '柳宗元',
-                            content: '千山鳥飛絕，萬徑人蹤滅。\n孤舟蓑笠翁，獨釣寒江雪。',
-                            translation: '群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁；他正獨自在漫天風雪的寒冷江面上垂釣。',
-                            appreciation: '這首詩描繪了一幅極度幽靜、空靈的寒江雪景圖。前兩句以廣闊背景，烘托出大雪封山、萬物絕跡的絕對死寂與孤寒。隨後視角急轉直下，聚焦於茫茫白雪中「孤舟」上的「蓑笠翁」。傲然獨釣寄託了詩人清高孤傲、不屈不撓的高潔品格。',
-                            video: 'https://www.youtube.com/embed/vIc1XjFqU6o',
-                            enSummary: 'A traditional Chinese ink painting. Vast, snowy, silent river landscape with a tiny boat and an old fisherman.'
-                        },
-                        fengqiao: {
-                            title: '楓橋夜泊', author: '張繼',
-                            content: '月落烏啼霜滿天，江楓漁火對愁眠。\n姑蘇城外寒山寺，夜半鐘聲到客船。',
-                            translation: '月亮已經落下，烏鴉聲聲啼叫，秋霜瀰漫了整個夜空；面對著江邊的楓樹和江面上點點的漁火，滿懷愁緒的旅人難以入睡。此時，寒山寺在半夜裡敲響的悠揚鐘聲，陣陣傳到了客船上。',
-                            appreciation: '這首詩描繪了一幅江南深秋夜泊的孤寂畫卷。落月、啼烏、滿天霜、江楓與漁火等意象，交織出清冷幽暗的淒美與寂寥。悠遠的鐘聲劃破了夜空的寧靜，深深觸動了旅人孤寂的心靈。',
-                            video: 'https://www.youtube.com/embed/xgSCYzVo29g',
-                            enSummary: 'A traditional Chinese ink painting. Midnight at Maple Bridge, frost, moonlight, fishing lights, melancholy mood.'
-                        },
-                        shanxing: {
-                            title: '山行', author: '杜牧',
-                            content: '遠上寒山石徑斜，白雲生處有人家。\n停車坐愛楓林晚，霜葉紅於二月花。',
-                            translation: '沿著傾斜蜿蜒的石板小路，向著高遠的秋日山峰攀登；在白雲繚繞飄浮的高處，隱約可以看到幾戶人家。特地停下馬車，是因為太過喜愛這深秋楓林的傍晚美景；那經過秋霜染透的楓葉，簡直比春花還要鮮紅奪目。',
-                            appreciation: '這首詩描繪了一幅生機勃勃的秋日山林圖。高遠空靈的背景，並以「有人家」點綴出一抹溫暖。詩人以「紅於二月花」讚美霜葉，一掃蕭瑟悲涼，營造出色彩明麗、充滿熱情與生機的氛圍。',
-                            video: 'https://www.youtube.com/embed/Q95hBdIb_Iw',
-                            enSummary: 'A vibrant traditional Chinese painting. Autumn mountain, winding path, cottages in clouds, fiery red maple leaves in evening light.'
-                        },
-                        baidicheng: {
-                            title: '早發白帝城', author: '李白',
-                            content: '朝辭白帝彩雲間，千里江陵一日還。\n兩岸猿聲啼不住，輕舟已過萬重山。',
-                            translation: '清晨時分，告別了高聳入雲、彩雲深處的白帝城；千里江陵乘船順流而下，一天之內就能抵達。長江兩岸猿猴的啼叫聲連綿不絕；就在這清脆的啼聲中，輕快的小船早已經駛過了千山萬嶺。',
-                            appreciation: '這首詩生動描繪了詩人重獲自由後暢快心情。彩雲奠定了明朗與歡悅的氛圍。連綿不絕的猿啼聲作為動態背景，生動烘托出「輕舟」乘風破浪的輕捷姿態，節奏明快、氣勢奔放。',
-                            video: 'https://www.youtube.com/embed/zlnG0EGNUWc',
-                            enSummary: 'A magnificent traditional Chinese painting. Yangtze River gorges at dawn, colorful clouds, steep mountains, rapid small boat, joyful atmosphere.'
-                        },
-                        guanquelou: {
-                            title: '登鸛雀樓', author: '王之渙',
-                            content: '白日依山盡，黃河入海流。\n欲窮千里目，更上一層樓。',
-                            translation: '夕陽依傍著連綿的群山漸漸西沉隱沒，奔騰的黃河水向著大海滾滾東流。如果想要將千里之外更為遼闊的景致盡收眼底，就需要再往上登高一層樓。',
-                            appreciation: '這首詩描繪了一幅北方雄奇壯麗的山水畫卷。視角開闊，由落日轉向奔流江水，營造出雄渾壯闊、氣象萬千的氛圍。後半段寫景昇華為哲理，表達了積極向上、不断攀登的進取精神。',
-                            video: 'https://www.youtube.com/embed/ihTCFnDbYSo',
-                            enSummary: 'A majestic traditional Chinese painting. Grand sunset over mountains, vast Yellow River flowing, panoramic view from a tower.'
-                        }
+                        jiangxue: { title: '江雪', author: '柳宗元', content: '千山鳥飛絕，萬徑人蹤滅。\n孤舟蓑笠翁，獨釣寒江雪。', translation: '群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁；他正獨自在漫天風雪的寒冷江面上垂釣。', appreciation: '這首詩描繪了一幅極度幽靜、空靈的寒江雪景圖。前兩句烘托出大雪封山、萬物絕跡的絕對死寂與孤寒氛圍。隨後視角急轉直下，聚焦於茫茫白雪中「孤舟」上的「蓑笠翁」。', video: 'https://www.youtube.com/embed/vIc1XjFqU6o' },
+                        fengqiao: { title: '楓橋夜泊', author: '張繼', content: '月落烏啼霜滿天，江楓漁火對愁眠。\n姑蘇城外寒山寺，夜半鐘聲到客船。', translation: '月亮已經落下，烏鴉聲聲啼叫，秋霜瀰漫了整個夜空；面對著江邊的楓樹和江面上點點的漁火，滿懷愁緒的旅人難以入睡。此時，姑蘇城外那座寒山寺，在半夜裡敲響的悠揚鐘聲，陣陣傳到了客船上。', appreciation: '這首詩描繪了一幅江南深秋夜泊的孤寂畫卷。透過落月、啼烏、滿天霜、江楓與漁火等意象，交織出清冷幽暗的淒美與寂寥氛圍。後兩句則巧妙地「以動襯靜」，鐘聲劃破了夜空的寧靜。', video: 'https://www.youtube.com/embed/xgSCYzVo29g' },
+                        shanxing: { title: '山行', author: '杜牧', content: '遠上寒山石徑斜，白雲生處有人家。\n停車坐愛楓林晚，霜葉紅於二月花。', translation: '沿著傾斜蜿蜒的石板小路，向著高遠的秋日山峰攀登；在白雲繚繞飄浮的高處，隱約可以看到幾戶人家。特地停下馬車，是因為太過喜愛這深秋楓林的傍晚美景；那經過秋霜染透的楓葉，比二月裡的春花還要紅。', appreciation: '這首詩描繪了一幅生機勃勃的秋日山林圖。勾勒出高遠空靈的背景，並以「有人家」點綴出一抹溫暖的人間煙火。詩人以「紅於二月花」讚美霜葉，一掃傳統詠秋詩的蕭瑟，營造出明麗與熱情的氛圍。', video: 'https://www.youtube.com/embed/Q95hBdIb_Iw' },
+                        baidicheng: { title: '早發白帝城', author: '李白', content: '朝辭白帝彩雲間，千里江陵一日還。\n兩岸猿聲啼不住，輕舟已過萬重山。', translation: '清晨時分，告別了宛如隱沒在彩雲深處的白帝城；相距千里的江陵，乘船順流而下，一天之內就能抵達。兩岸猿猴的啼叫聲連綿不絕；就在這清脆的啼聲中，輕快的小船早已經駛過了千山萬嶺。', appreciation: '這首詩生動描繪了詩人遇赦後順江而下的暢快心情。奠定了明朗與歡悅的氛圍。「千里」與「一日」凸顯了船行之速。輕舟乘風破浪的輕捷姿態，完美融合了山水景色與喜悅之情。', video: 'https://www.youtube.com/embed/zlnG0EGNUWc' },
+                        guanquelou: { title: '登鸛雀樓', author: '王之渙', content: '白日依山盡，黃河入海流。\n欲窮千里目，更上一層樓。', translation: '夕陽依傍著連綿的群山漸漸西沉隱沒，奔騰的黃河水向著大海滾滾東流。如果想要將千里之外更為遼闊的景致盡收眼底，就需要再往上登高一層樓。', appreciation: '這首詩描繪了一幅北方雄奇壯麗的山水畫卷。視角開闊，由高遠的落日轉向奔流的江水，營造出雄渾壯闊、氣象萬千的氛圍。表達了「站得高才能看得遠」的哲理，意境極為高遠。', video: 'https://www.youtube.com/embed/ihTCFnDbYSo' }
                     }
                 }
             },
             computed: { currentPoem() { return this.poems[this.currentKey]; } },
             methods: {
-                selectPoem(key) { 
-                    this.currentKey = key; this.finalPrompt = ''; 
-                    this.analysis = { far:['','',''], mid:['','',''], near:['','',''], mood1:'', mood2:'', color:'#d1d5db' };
-                },
+                selectPoem(key) { this.currentKey = key; this.finalPrompt = ''; this.analysis = { far:['','',''], mid:['','',''], near:['','',''], mood1:'', mood2:'', color:'#d1d5db' }; },
                 generatePrompt() {
-                    const farC = this.analysis.far.filter(i => i.trim()).length;
-                    const midC = this.analysis.mid.filter(i => i.trim()).length;
-                    const nearC = this.analysis.near.filter(i => i.trim()).length;
-                    if (farC < 2 || midC < 2 || nearC < 2 || !this.analysis.mood1 || !this.analysis.mood2) {
-                        alert('【作業提醒】遠景、中景、近景請各輸入至少兩項景物，並填寫兩項氣氛形容詞喔！'); return;
+                    const f = this.analysis.far.filter(i => i.trim());
+                    const m = this.analysis.mid.filter(i => i.trim());
+                    const n = this.analysis.near.filter(i => i.trim());
+                    if (f.length < 2 || m.length < 2 || n.length < 2 || !this.analysis.mood1) {
+                        alert('【提醒】遠、中、近景請至少填寫兩項，並輸入氣氛形容詞。'); return;
                     }
-                    const fText = this.analysis.far.filter(i => i).join(', ');
-                    const mText = this.analysis.mid.filter(i => i).join(', ');
-                    const nText = this.analysis.near.filter(i => i).join(', ');
-
-                    // 針對直幅三段式構圖優化的提示詞
-                    this.finalPrompt = `/* Art Style: Traditional Chinese Ink and Wash Painting, Masterpiece,Poetic.*/
-/* Composition: High vertical composition, Vertical orientation. */
-/* Scene Structure: Strict vertical three-stage composition (遠、中、近景三段式構圖), Clear layered perspective. */
-
-/* Poem Context: ${this.currentPoem.enSummary} */
-
-/* Visual Layers (Arranged vertically from Top to Bottom): */
-- Background (Far Distance, Top): ${fText}.
-- Middle Ground (Mid Distance, Middle): ${mText}.
-- Foreground (Near Distance, Bottom): ${nText}.
-
-/* Aesthetic & Mood: */
-Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}, serene, empty, profound space usage (Liubai, 留白).
-Main Color Tone: Base color based on ${this.analysis.color}, high contrast monochrome ink wash, epic composition.
-
---ar 1:2 --style expressive --v 6.0`; // 尾部加入 AR 比例參數 (適合 Midjourney)
                     
+                    // 重新設計的「人話」提示詞邏輯，避開技術符號
+                    this.finalPrompt = `請為我創作一張傳統中國水墨畫風格的圖片。
+主題是詩詞《${this.currentPoem.title}》的意境。
+
+這張畫必須採用「垂直長方形」的構圖（比例 1:2），並嚴格按照「遠、中、近」三段式從上到下佈置景物：
+
+1. 畫面最上方（遠景）要畫出：${f.join('、')}。
+2. 畫面中間（中景）要畫出：${m.join('、')}。
+3. 畫面最下方（近景）要畫出：${n.join('、')}。
+
+藝術細節：
+- 風格：古典水墨暈染，注重留白（Liubai）意境。
+- 氣氛：展現出一種「${this.analysis.mood1}」且「${this.analysis.mood2}」的感覺。
+- 色調：整體以「${this.analysis.color}」色系為視覺基調。
+
+請確保構圖高聳、層次分明，展現出中國山水畫的高遠意境。`;
+
                     setTimeout(() => { document.getElementById('result').scrollIntoView({ behavior: 'smooth' }); }, 100);
                 },
-                copyPrompt() { navigator.clipboard.writeText(this.finalPrompt); alert('提示詞已複製！請貼到 Bing 或其他 AI 繪圖網站。'); }
+                copyPrompt() { navigator.clipboard.writeText(this.finalPrompt); alert('提示詞已複製！請前往豆包或 Bing 貼上。'); }
             }
         }).mount('#app');
     </script>
