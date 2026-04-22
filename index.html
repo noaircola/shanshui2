@@ -8,11 +8,12 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #333; }
-        .card { background: white; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 2rem; margin-bottom: 2rem; border: 1px solid #e2e2d5; }
-        .input-box { width: 100%; border-bottom: 2px solid #ccc; padding: 8px; outline: none; transition: border-color 0.3s; background: transparent; }
-        .input-box:focus { border-color: #8b5e3c; }
-        .label-tag { font-size: 0.8rem; font-weight: bold; color: #8b5e3c; margin-bottom: 0.5rem; display: block; }
+        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #333; line-height: 1.6; }
+        .card { background: white; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; border: 1px solid #e2e2d5; shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .input-box { width: 100%; border-bottom: 2px solid #ddd; padding: 6px; outline: none; transition: all 0.3s; background: transparent; font-size: 0.9rem; }
+        .input-box:focus { border-color: #8b5e3c; background: #fffcf5; }
+        .label-tag { font-size: 0.85rem; font-weight: bold; color: #8b5e3c; margin-bottom: 0.75rem; display: block; border-left: 3px solid #8b5e3c; padding-left: 8px; }
+        .error-hint { color: #dc2626; font-size: 0.75rem; margin-top: 4px; display: block; }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -20,79 +21,103 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div class="card flex flex-col justify-center">
                 <h2 class="text-3xl font-bold mb-4 text-stone-800">柳宗元《江雪》</h2>
-                <p class="text-xl tracking-[0.2em] leading-loose mb-6 border-l-4 border-stone-300 pl-4">
+                <p class="text-xl tracking-[0.25em] leading-loose mb-6 border-l-4 border-stone-300 pl-6 font-bold">
                     千山鳥飛絕，萬徑人蹤滅。<br>
                     孤舟蓑笠翁，獨釣寒江雪。
                 </p>
                 <h3 class="font-bold text-stone-600 mb-2">【語譯】</h3>
-                <p class="text-stone-500 leading-relaxed text-sm">
-                    群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁，正獨自在漫天風雪的寒冷江面上垂釣。
+                <p class="text-stone-500 text-sm leading-relaxed">
+                    群山之中，連一隻飛鳥的影子都看不見；無數條小路上，也找不到任何行人的足跡。只有江面上的一葉孤舟裡，坐著一位身披蓑衣、頭戴斗笠的老漁翁；他正獨自在漫天風雪的寒冷江面上垂釣。
                 </p>
             </div>
-            <div class="card p-0 overflow-hidden aspect-video shadow-2xl">
+            <div class="card p-0 overflow-hidden aspect-video shadow-2xl bg-black">
                 <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vIc1XjFqU6o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
         </div>
 
         <div class="card">
             <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm">1</span>
-                觀察景物：試在詩中找被描繪的景物，並以遠中近景將其分類
+                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">1</span>
+                觀察景物：請在詩中找出景物，並分類填寫（每類至少填寫兩項）
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div>
-                    <label class="label-tag">遠景 (如：群山、天空)</label>
-                    <input v-model="analysis.far" class="input-box" placeholder="輸入景物...">
+                    <label class="label-tag">遠景 (如：山、天空、雲)</label>
+                    <div class="space-y-3">
+                        <input v-model="analysis.far[0]" class="input-box" placeholder="景物 1 (必填)">
+                        <input v-model="analysis.far[1]" class="input-box" placeholder="景物 2 (必填)">
+                        <input v-model="analysis.far[2]" class="input-box" placeholder="景物 3 (選填)">
+                    </div>
                 </div>
                 <div>
-                    <label class="label-tag">中景 (如：江面、小徑)</label>
-                    <input v-model="analysis.mid" class="input-box" placeholder="輸入景物...">
+                    <label class="label-tag">中景 (如：江水、雪、小徑)</label>
+                    <div class="space-y-3">
+                        <input v-model="analysis.mid[0]" class="input-box" placeholder="景物 1 (必填)">
+                        <input v-model="analysis.mid[1]" class="input-box" placeholder="景物 2 (必填)">
+                        <input v-model="analysis.mid[2]" class="input-box" placeholder="景物 3 (選填)">
+                    </div>
                 </div>
                 <div>
-                    <label class="label-tag">近景 (如：孤舟、漁翁)</label>
-                    <input v-model="analysis.near" class="input-box" placeholder="輸入景物...">
+                    <label class="label-tag">近景 (如：孤舟、漁翁、蓑衣)</label>
+                    <div class="space-y-3">
+                        <input v-model="analysis.near[0]" class="input-box" placeholder="景物 1 (必填)">
+                        <input v-model="analysis.near[1]" class="input-box" placeholder="景物 2 (必填)">
+                        <input v-model="analysis.near[2]" class="input-box" placeholder="景物 3 (選填)">
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm">2</span>
-                意境與色彩分析
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="bg-stone-800 text-white w-8 h-8 rounded-full flex justify-center items-center text-sm font-mono">2</span>
+                賞析與氛圍感
             </h3>
-            <div class="bg-stone-50 p-4 rounded-lg mb-6 text-sm text-stone-600 leading-relaxed italic">
-                「這首詩描繪了一幅極度幽靜、空靈的寒江雪景圖。前兩句以廣闊背景烘托出萬物絕跡的絕對死寂與孤寒氛圍...」
-            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="mb-8">
+                <label class="label-tag">賞析資料參考</label>
+                <div class="bg-stone-50 p-6 rounded-xl text-stone-600 text-sm leading-7 border border-stone-100 shadow-inner">
+                    這首詩描繪了一幅極度<strong>幽靜、空靈</strong>的寒江雪景圖。前兩句以「千山」、「萬徑」的廣闊背景，烘托出大雪封山、萬物絕跡的<strong>絕對死寂與孤寒</strong>氛圍。隨後視角急轉直下，聚焦於茫茫白雪中「孤舟」上的「蓑笠翁」。在凜冽的風雪中，老翁傲然獨釣，不僅渲染出<strong>清冷、孤獨</strong>的絕美意境，更巧妙地寄託了詩人當時雖遭貶謫，卻依然清高孤傲、不屈不撓的高潔品格。
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                    <label class="label-tag">你想用哪兩個詞形容這首詩的氣氛？</label>
-                    <div class="flex gap-2">
-                        <input v-model="analysis.mood1" class="input-box" placeholder="形容詞 1">
-                        <input v-model="analysis.mood2" class="input-box" placeholder="形容詞 2">
+                    <label class="label-tag">根據賞析，嘗試想像詩中的氛圍會是怎樣的？</label>
+                    <p class="text-xs text-stone-400 mb-3">請輸入兩個形容詞 (如：孤寂、清冷、壯闊)</p>
+                    <div class="flex gap-4">
+                        <input v-model="analysis.mood1" class="input-box" placeholder="氣氛 1">
+                        <input v-model="analysis.mood2" class="input-box" placeholder="氣氛 2">
                     </div>
                 </div>
                 <div>
-                    <label class="label-tag">選擇詩中的主色調 (點擊圓圈選擇顏色)</label>
-                    <div class="flex items-center gap-4 mt-2">
-                        <input type="color" v-model="analysis.color" class="w-12 h-12 rounded-full cursor-pointer border-none">
-                        <span class="text-sm text-stone-500">當前選擇：{{ analysis.color }}</span>
+                    <label class="label-tag">選擇你想像中的意境色調</label>
+                    <p class="text-xs text-stone-400 mb-3">拖動下方色塊來決定詩畫的色彩基調</p>
+                    <div class="flex items-center gap-4">
+                        <input type="color" v-model="analysis.color" class="w-14 h-14 rounded-full cursor-pointer border-2 border-white shadow-md">
+                        <span class="text-xs font-mono text-stone-500 bg-white px-2 py-1 rounded border">{{ analysis.color }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="text-center mb-20">
-            <button @click="generatePrompt" class="bg-stone-800 hover:bg-stone-700 text-white px-10 py-4 rounded-full font-bold text-lg transition-all shadow-xl">
-                ✨ 生成 AI 繪圖提示詞
+            <button @click="generatePrompt" class="bg-stone-800 hover:bg-black text-white px-12 py-4 rounded-full font-bold text-lg transition-all shadow-2xl active:scale-95">
+                ✨ 生成圖片提詩詞
             </button>
 
-            <div v-if="finalPrompt" class="mt-8 p-6 bg-white border-2 border-dashed border-stone-400 rounded-xl animate-fade-in">
-                <p class="text-xs font-bold text-stone-400 mb-2 uppercase tracking-widest">以下是你的 AI 提示詞 (English Version for AI)</p>
-                <div class="bg-stone-100 p-4 rounded-lg text-lg font-mono mb-4 text-left">
+            <div v-if="finalPrompt" id="result" class="mt-10 p-8 bg-white border-2 border-stone-200 rounded-2xl shadow-sm text-left animate-fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-black text-stone-400 uppercase tracking-tighter">AI Prompt (已整合詩詞與分析)</span>
+                    <button @click="copyPrompt" class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-md hover:bg-blue-100 transition">📋 點擊複製</button>
+                </div>
+                <div class="bg-stone-50 p-5 rounded-xl text-stone-700 font-mono text-sm leading-relaxed border border-stone-100">
                     {{ finalPrompt }}
                 </div>
-                <button @click="copyPrompt" class="text-blue-600 font-bold hover:underline">📋 點擊複製提示詞</button>
+                <div class="mt-6 flex flex-col items-center">
+                    <p class="text-xs text-stone-400 mb-3">複製後可前往以下平台生成圖片：</p>
+                    <a href="https://www.bing.com/images/create" target="_blank" class="text-blue-500 underline text-sm font-bold">Bing Image Creator (推薦)</a>
+                </div>
             </div>
         </div>
     </div>
@@ -103,30 +128,53 @@
             data() {
                 return {
                     analysis: {
-                        far: '', mid: '', near: '',
-                        mood1: '', mood2: '',
-                        color: '#cccccc'
+                        far: ['', '', ''],
+                        mid: ['', '', ''],
+                        near: ['', '', ''],
+                        mood1: '',
+                        mood2: '',
+                        color: '#d1d5db'
                     },
                     finalPrompt: ''
                 }
             },
             methods: {
                 generatePrompt() {
-                    if(!this.analysis.far || !this.analysis.mood1) {
-                        alert('請填寫景物與氛圍分析，這能幫助 AI 畫得更好！');
+                    // 驗證邏輯：每一景至少填兩個
+                    const farCount = this.analysis.far.filter(i => i.trim() !== '').length;
+                    const midCount = this.analysis.mid.filter(i => i.trim() !== '').length;
+                    const nearCount = this.analysis.near.filter(i => i.trim() !== '').length;
+
+                    if (farCount < 2 || midCount < 2 || nearCount < 2 || !this.analysis.mood1 || !this.analysis.mood2) {
+                        alert('【提醒】遠、中、近景請至少各填寫兩項景物，並輸入兩個氣氛形容詞喔！');
                         return;
                     }
-                    // 將中文輸入轉化為 AI 較易理解的英文模板 (實際應用中可加入簡單翻譯邏輯或直接用中文，現在主流AI也懂中文)
-                    const base = "Traditional Chinese Ink Painting style, master work, high quality.";
-                    const content = `Scene: ${this.analysis.far} in distance, ${this.analysis.mid} in middle ground, ${this.analysis.near} in foreground.`;
-                    const mood = `Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}, cold, silent, snowy.`;
-                    const color = `Main color tone: ${this.analysis.color}.`;
-                    
-                    this.finalPrompt = `${base} ${content} ${mood} ${color} Minimalist composition, heavy snow.`;
+
+                    // 整合景物字串
+                    const farText = this.analysis.far.filter(i => i).join(', ');
+                    const midText = this.analysis.mid.filter(i => i).join(', ');
+                    const nearText = this.analysis.near.filter(i => i).join(', ');
+
+                    // 生成提示詞
+                    // 包含原文以幫助 AI 理解深度意境
+                    this.finalPrompt = `Subject: Traditional Chinese Ink Painting, "Jiang Xue" (River Snow). 
+Poem Context: "Thousands of mountains, no birds fly; tens of thousands of paths, no footprints. A lone boat, an old man in straw cape and bamboo hat, fishing alone in the cold river snow."
+Atmosphere: ${this.analysis.mood1}, ${this.analysis.mood2}, cinematic lighting, cold, serene, minimalist.
+Composition: 
+- Background (Far): ${farText}
+- Midground (Mid): ${midText}
+- Foreground (Near): ${nearText}
+Color Palette: Based on ${this.analysis.color}, monochrome style with ink wash effects. 
+Style: Highly detailed, zen, empty space (Liubai), 8k resolution.`;
+
+                    // 滾動到結果
+                    setTimeout(() => {
+                        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
                 },
                 copyPrompt() {
                     navigator.clipboard.writeText(this.finalPrompt);
-                    alert('提示詞已複製！可以前往 AI 繪圖網站貼上了。');
+                    alert('提示詞已複製！請貼到 AI 繪圖網站。');
                 }
             }
         }).mount('#app');
